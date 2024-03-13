@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Rental</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        ul.list-group {
+            margin-top: 20px;
+        }
+        .list-group-item {
+            padding: 10px 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Car Rental</h1>
+
+        <h2>Add Customer</h2>
+        <form action="{{ url_for('add_customer') }}" method="post" class="mb-3">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <button type="submit" class="btn btn-primary mr-2">Add Customer</button>
+        </form>
+
+        <h2 class="mt-4">Customers</h2>
+        <ul class="list-group">
+            {% for customer in customers %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <div>{{ customer.name }}</div>
+                    <div>{{ customer.email }}</div>
+                </div>
+                <div>
+                    <form action="{{ url_for('edit_customer', id=customer.id) }}" method="get" class="d-inline mr-2">
+                        <button type="submit" class="btn btn-info btn-sm">Edit</button>
+                    </form>
+                    <form action="{{ url_for('delete_customer', id=customer.id) }}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <h2 class="mt-4">Add Car</h2>
+        <form action="{{ url_for('add_car') }}" method="post" class="mb-3">
+            <div class="form-group">
+                <label for="brand">Brand:</label>
+                <input type="text" class="form-control" id="brand" name="brand" required>
+            </div>
+            <div class="form-group">
+                <label for="model">Model:</label>
+                <input type="text" class="form-control" id="model" name="model" required>
+            </div>
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="rented" name="rented">
+                <label class="form-check-label" for="rented">Rented</label>
+            </div>
+            <div id="rentedFields" style="display: none;">
+                <div class="form-group">
+                    <label for="customer">Customer:</label>
+                    <select class="form-control" id="customer" name="customer">
+                        <option value="">None</option>
+                        {% for customer in customers %}
+                        <option value="{{ customer.id }}">{{ customer.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="distance">Distance:</label>
+                    <input type="number" class="form-control" id="distance" name="distance">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mr-2">Add Car</button>
+        </form>
+
+        <h2 class="mt-4">Cars</h2>
+        <ul class="list-group">
+            {% for car in cars %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <div>{{ car.brand }} - {{ car.model }}</div>
+                    <div>
+                        {% if car.rented %}
+                        Rented to: {% if car.rented_to %}{{ car.rented_to.name }}{% else %}Unknown{% endif %} - Distance: {{ car.rented_distance }} km
+                        {% else %}
+                        Not Rented
+                        {% endif %}
+                    </div>
+                </div>
+                <div>
+                    <form action="{{ url_for('edit_car', id=car.id) }}" method="get" class="d-inline mr-2">
+                        <button type="submit" class="btn btn-info btn-sm">Edit</button>
+                    </form>
+                    <form action="{{ url_for('delete_car', id=car.id) }}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <h2 class="mt-4">Rented Cars</h2>
+        <ul class="list-group">
+            {% for rented_car in rented_cars %}
+            <li class="list-group-item">
+                {{ rented_car.brand }} - {{ rented_car.model }} - Rented to: {% if rented_car.rented_to %}{{ rented_car.rented_to.name }}{% else %}Unknown{% endif %} - Distance: {{ rented_car.rented_distance }} km
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <script>
+        document.getElementById('rented').addEventListener('change', function() {
+            var rentedFields = document.getElementById('rentedFields');
+            if (this.checked) {
+                rentedFields.style.display = 'block';
+            } else {
+                rentedFields.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
