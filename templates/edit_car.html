@@ -4,38 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Car</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container mt-5">
         <h1>Edit Car</h1>
-        <form action="{{ url_for('edit_car', id=car.id) }}" method="post">
+        <form method="post">
             <div class="form-group">
-                <label for="brand">Brand:</label>
-                <input type="text" class="form-control" id="brand" name="brand" value="{{ car.brand }}" required>
+                <label for="car_brand">Brand:</label>
+                <input type="text" class="form-control" id="car_brand" name="brand" value="{{ car.brand }}" required>
             </div>
             <div class="form-group">
-                <label for="model">Model:</label>
-                <input type="text" class="form-control" id="model" name="model" value="{{ car.model }}" required>
+                <label for="car_model">Model:</label>
+                <input type="text" class="form-control" id="car_model" name="model" value="{{ car.model }}" required>
+            </div>
+            <div class="form-group">
+                <label for="car_license_plate">License Plate:</label>
+                <input type="text" class="form-control" id="car_license_plate" name="license_plate" value="{{ car.license_plate }}" required>
             </div>
             <div class="form-group form-check">
-                <input type="checkbox" class="form-check-input" id="rented" name="rented" {% if car.rented %}checked{% endif %}>
-                <label class="form-check-label" for="rented">Rented</label>
+                <input type="checkbox" class="form-check-input" id="car_rented" name="rented" {% if car.rented %}checked{% endif %}>
+                <label class="form-check-label" for="car_rented">Rented</label>
             </div>
             <div class="form-group">
-                <label for="customer">Customer:</label>
-                <select class="form-control" id="customer" name="customer">
+                <label for="car_customer">Customer:</label>
+                <select class="form-control" id="car_customer" name="customer">
                     <option value="">None</option>
                     {% for customer in customers %}
-                    <option value="{{ customer.id }}" {% if car.rented_to == customer.id %}selected{% endif %}>{{ customer.name }}</option>
+                        <option value="{{ customer.id }}" {% if car.rented_to == customer.id %}selected{% endif %}>{{ customer.name }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="form-group">
-                <label for="distance">Distance:</label>
-                <input type="number" class="form-control" id="distance" name="distance" value="{{ car.rented_distance }}">
+                <label for="car_distance">Distance:</label>
+                <input type="number" class="form-control" id="car_distance" name="distance" value="{{ car.rented_distance }}">
             </div>
-            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
 </body>

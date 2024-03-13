@@ -14,6 +14,7 @@ class Car(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     brand = db.Column(db.String(100), nullable=False)
     model = db.Column(db.String(100), nullable=False)
+    license_plate = db.Column(db.String(20), nullable=False, unique=True)  # New column for license plate
     rented = db.Column(db.Boolean, default=False)
     rented_to = db.Column(db.Integer, db.ForeignKey('customer.id'))
     rented_distance = db.Column(db.Integer)
@@ -26,7 +27,12 @@ def index():
     customers = Customer.query.all()
     cars = Car.query.all()
     rented_cars = Car.query.filter_by(rented=True).all()
-    return render_template('index.html', customers=customers, cars=cars, rented_cars=rented_cars)
+    
+    # Erstelle ein Dictionary mit Kunden-IDs als Schlüssel und Kunden-Namen als Wert
+    customer_names = {customer.id: customer.name for customer in customers}
+    
+    return render_template('index.html', customers=customers, cars=cars, rented_cars=rented_cars, customer_names=customer_names)
+
 
 @app.route('/add_customer', methods=['POST'])
 def add_customer():
@@ -58,18 +64,17 @@ def delete_customer(id):
 def add_car():
     brand = request.form['brand']
     model = request.form['model']
+    license_plate = request.form['license_plate']  # New license plate field
     rented = 'rented' in request.form
-    customer_id = request.form.get('customer')
-    distance = int(request.form.get('distance', 0))
-    
-    new_car = Car(brand=brand, model=model, rented=rented, rented_distance=distance)
-    if rented and customer_id:
-        new_car.rented_to = int(customer_id) # Konvertiere die Kunden-ID in eine Ganzzahl
+    rented_to = None
+    rented_distance = None
+    if rented:
+        rented_to = request.form['customer']
+        rented_distance = request.form['distance']
+    new_car = Car(brand=brand, model=model, license_plate=license_plate, rented=rented, rented_to=rented_to, rented_distance=rented_distance)
     db.session.add(new_car)
     db.session.commit()
     return redirect(url_for('index'))
-
-
 
 @app.route('/edit_car/<int:id>', methods=['GET', 'POST'])
 def edit_car(id):
@@ -77,6 +82,7 @@ def edit_car(id):
     if request.method == 'POST':
         car.brand = request.form['brand']
         car.model = request.form['model']
+        car.license_plate = request.form['license_plate']  # Update license plate field
         car.rented = 'rented' in request.form
         car.rented_to = request.form['customer']
         car.rented_distance = request.form['distance']

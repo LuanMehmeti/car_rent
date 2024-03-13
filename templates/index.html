@@ -4,23 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Car Rental</title>
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Custom CSS -->
     <style>
         body {
             font-family: Arial, sans-serif;
-            font-size: 16px;
             line-height: 1.6;
-            color: #333;
+            font-size: 16px;
         }
         h1, h2, h3, h4, h5, h6 {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: bold;
             margin-top: 20px;
             margin-bottom: 10px;
         }
-        ul.list-group {
-            margin-top: 20px;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .btn {
+            font-size: 16px;
         }
         .list-group-item {
-            padding: 10px 15px;
+            font-size: 16px;
+        }
+        /* Stil für die gemieteten Autos */
+        .rented-car {
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .rented-car p {
+            margin-bottom: 5px;
         }
     </style>
 </head>
@@ -41,14 +61,11 @@
             <button type="submit" class="btn btn-primary mr-2">Add Customer</button>
         </form>
 
-        <h2 class="mt-4">Customers</h2>
+        <h2>Customers</h2>
         <ul class="list-group">
             {% for customer in customers %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    <div>{{ customer.name }}</div>
-                    <div>{{ customer.email }}</div>
-                </div>
+                {{ customer.name }} - {{ customer.email }}
                 <div>
                     <form action="{{ url_for('edit_customer', id=customer.id) }}" method="get" class="d-inline mr-2">
                         <button type="submit" class="btn btn-info btn-sm">Edit</button>
@@ -61,7 +78,7 @@
             {% endfor %}
         </ul>
 
-        <h2 class="mt-4">Add Car</h2>
+        <h2>Add Car</h2>
         <form action="{{ url_for('add_car') }}" method="post" class="mb-3">
             <div class="form-group">
                 <label for="brand">Brand:</label>
@@ -70,6 +87,10 @@
             <div class="form-group">
                 <label for="model">Model:</label>
                 <input type="text" class="form-control" id="model" name="model" required>
+            </div>
+            <div class="form-group">
+                <label for="license_plate">License Plate:</label>
+                <input type="text" class="form-control" id="license_plate" name="license_plate" required>
             </div>
             <div class="form-group form-check">
                 <input type="checkbox" class="form-check-input" id="rented" name="rented">
@@ -93,20 +114,11 @@
             <button type="submit" class="btn btn-primary mr-2">Add Car</button>
         </form>
 
-        <h2 class="mt-4">Cars</h2>
+        <h2>Cars</h2>
         <ul class="list-group">
             {% for car in cars %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    <div>{{ car.brand }} - {{ car.model }}</div>
-                    <div>
-                        {% if car.rented %}
-                        Rented to: {% if car.rented_to %}{{ car.rented_to.name }}{% else %}Unknown{% endif %} - Distance: {{ car.rented_distance }} km
-                        {% else %}
-                        Not Rented
-                        {% endif %}
-                    </div>
-                </div>
+                {{ car.brand }} - {{ car.model }} - {{ car.license_plate }}
                 <div>
                     <form action="{{ url_for('edit_car', id=car.id) }}" method="get" class="d-inline mr-2">
                         <button type="submit" class="btn btn-info btn-sm">Edit</button>
@@ -119,16 +131,26 @@
             {% endfor %}
         </ul>
 
-        <h2 class="mt-4">Rented Cars</h2>
-        <ul class="list-group">
-            {% for rented_car in rented_cars %}
-            <li class="list-group-item">
-                {{ rented_car.brand }} - {{ rented_car.model }} - Rented to: {% if rented_car.rented_to %}{{ rented_car.rented_to.name }}{% else %}Unknown{% endif %} - Distance: {{ rented_car.rented_distance }} km
-            </li>
-            {% endfor %}
-        </ul>
+        <!-- Anzeige der vermieteten Autos und deren Verhältnis zu allen Autos -->
+        <h2>Rented Cars</h2>
+        <p>{{ rented_cars|length }}/{{ cars|length }} cars rented</p>
+        {% for rented_car in rented_cars %}
+        <div class="rented-car">
+            <p>{{ rented_car.brand }} - {{ rented_car.model }} - {{ rented_car.license_plate }}</p>
+            <p>Rented to: 
+            {% if rented_car.rented_to in customer_names %}
+                {{ customer_names[rented_car.rented_to] }}
+            {% else %}
+                None
+            {% endif %}
+            </p>
+            <p>Kilometers: {{ rented_car.rented_distance }}</p>
+        </div>
+        {% endfor %}
+
     </div>
 
+    <!-- JavaScript für die Anzeige des gemieteten Felds -->
     <script>
         document.getElementById('rented').addEventListener('change', function() {
             var rentedFields = document.getElementById('rentedFields');

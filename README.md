@@ -18,11 +18,7 @@ Setup and Installation:
 
     Clone the repository from GitHub: link-to-repository
     Navigate to the project directory.
-    Create a virtual environment:
 
-    bash
-
-python -m venv env
 
 Activate the virtual environment:
 
@@ -37,10 +33,6 @@ For Unix or MacOS:
 bash
 
     source env/bin/activate
-
-Install the required dependencies:
-
-pip install -r requirements.txt
 
 Run the application:
 
